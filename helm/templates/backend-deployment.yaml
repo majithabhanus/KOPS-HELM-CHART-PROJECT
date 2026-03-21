@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-backend
+  name: {{ .Release.Name }}-backend
 spec:
-  replicas: 1
+  replicas: {{ .Values.backend.replicas }}
   selector:
     matchLabels:
-      app: todo-backend
+      app: {{ .Release.Name }}-backend
   template:
     metadata:
       labels:
-        app: todo-backend
+        app: {{ .Release.Name }}-backend
     spec:
       containers:
         - name: todo-backend

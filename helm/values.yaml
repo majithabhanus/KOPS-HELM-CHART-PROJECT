@@ -1,6 +1,6 @@
 frontend:
   image:
-    repository: majithas/todo-ui
+    repository: majithas/todo-frontend
     tag: latest
   service:
     type: NodePort
@@ -12,7 +12,7 @@ backend:
     tag: latest
   service:
     type: ClusterIP
-    port: 8080
+    port: 8081
   env:
     DB_USER: admin
     DB_PASS: admin123
@@ -32,4 +32,5 @@ mysql:
     password: admin123
   service:
     port: 3306
+    targetPort: 3306
 

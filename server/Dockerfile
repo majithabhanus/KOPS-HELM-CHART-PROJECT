@@ -4,23 +4,21 @@ WORKDIR /todo
 
 COPY go.mod go.sum ./
 RUN go mod download
+
 COPY . .
 
-ENV DB_USER=admin
-ENV DB_PASS=admin123
-ENV DB_HOST=mysql-container
-ENV DB_PORT=3306
-ENV DB_NAME=mydb
-ENV JWT_SECRET=G9s!zX7$eA2@tKp
-
-EXPOSE 9000
-
-RUN go build -o todo ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o todo ./cmd/main.go
 
 FROM alpine:latest
 
+RUN adduser -D appuser
+
+WORKDIR /app
+
 COPY --from=builder /todo/todo .
+
+USER appuser
 
 EXPOSE 9000
 
-ENTRYPOINT [ "./todo" ]
+ENTRYPOINT ["./todo"]
