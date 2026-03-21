@@ -11,8 +11,8 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/majithabhanus/HELM-KOPS-PROJECT.git',
+                git branch: 'feature/devops',
+                    url: 'https://github.com/majithabhanus/KOPS-HELM-CHART-PROJECT.git',
                     credentialsId: 'github-cred'
             }
         }
