@@ -61,8 +61,11 @@ pipeline {
                 helm upgrade --install todo-app ${HELM_DIR} \
                 --namespace default \
                 --create-namespace \
-                --set frontend.image=${FRONTEND_IMAGE}:${BUILD_NUMBER} \
-                --set backend.image=${BACKEND_IMAGE}:${BUILD_NUMBER}
+                --set frontend.image.repository=${FRONTEND_IMAGE} \
+                --set frontend.image.tag=${BUILD_NUMBER} \
+                --set backend.image.repository=${BACKEND_IMAGE} \
+                --set backend.image.tag=${BUILD_NUMBER}
+
                 """
             }
         }
