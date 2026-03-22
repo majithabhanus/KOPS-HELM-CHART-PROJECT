@@ -64,8 +64,8 @@ pipeline {
         stage('Update Kubernetes Deployments') {
             steps {
                 sh '''
-                kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest --record || true
-                kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest --record || true
+                kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest1 --record || true
+                kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest1 --record || true
                 '''
             }
         }
