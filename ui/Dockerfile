@@ -10,6 +10,10 @@ RUN npm ci --omit=dev
 # Copy rest of code
 COPY . .
 
+# 🔥 FIX: give execute permission
+RUN chmod +x node_modules/.bin/vite
+
+
 # Build app
 RUN npm run build
 
