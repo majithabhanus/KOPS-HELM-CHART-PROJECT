@@ -55,6 +55,9 @@ pipeline {
         stage('Deploy using Helm') {
             steps {
                 sh """
+                pwd
+                ls -l
+                ls -l helm
                 helm upgrade --install todo-app ${HELM_DIR} \
                 --namespace default \
                 --create-namespace \
