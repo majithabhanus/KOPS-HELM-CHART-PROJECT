@@ -4,7 +4,7 @@ pipeline {
     environment {
         FRONTEND_IMAGE = "majithas/todo-frontend"
         BACKEND_IMAGE  = "majithas/todo-backend"
-        HELM_DIR        = "helm"
+        HELM_DIR       = "helm"
     }
 
     stages {
@@ -19,13 +19,13 @@ pipeline {
 
         stage('Build Frontend Docker Image') {
             steps {
-                sh 'docker build -t ${FRONTEND_IMAGE}:${BUILD_NUMBER} ./ui'
+                sh "docker build -t ${FRONTEND_IMAGE}:${BUILD_NUMBER} ./ui"
             }
         }
 
         stage('Build Backend Docker Image') {
             steps {
-                sh 'docker build -t ${BACKEND_IMAGE}:${BUILD_NUMBER} ./server'
+                sh "docker build -t ${BACKEND_IMAGE}:${BUILD_NUMBER} ./server"
             }
         }
 
@@ -36,37 +36,31 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin https://index.docker.io/v1/
+                    '''
                 }
             }
         }
 
         stage('Push Docker Images') {
             steps {
-                sh '''
+                sh """
                 docker push ${FRONTEND_IMAGE}:${BUILD_NUMBER}
                 docker push ${BACKEND_IMAGE}:${BUILD_NUMBER}
-                '''
+                """
             }
         }
 
         stage('Deploy using Helm') {
             steps {
-                sh '''
-                   helm upgrade --install todo-app ${HELM_DIR} \
-                    --namespace default \
-                    --create-namespace \
-                     --set frontend.image=${FRONTEND_IMAGE}:${BUILD_NUMBER} \
-                     --set backend.image=${BACKEND_IMAGE}:${BUILD_NUMBER}
-                      '''
-             }
-       } 
-        stage('Update Kubernetes Deployments') {
-            steps {
-                sh '''
-                kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}:latest1 --record || true
-                kubectl set image deployment/backend backend=${BACKEND_IMAGE}:latest1 --record || true
-                '''
+                sh """
+                helm upgrade --install todo-app ${HELM_DIR} \
+                --namespace default \
+                --create-namespace \
+                --set frontend.image=${FRONTEND_IMAGE}:${BUILD_NUMBER} \
+                --set backend.image=${BACKEND_IMAGE}:${BUILD_NUMBER}
+                """
             }
         }
 
@@ -79,6 +73,12 @@ pipeline {
                 '''
             }
         }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker system prune -f'
+            }
+        }
     }
 
     post {
@@ -86,10 +86,10 @@ pipeline {
             echo "✅ Application successfully deployed to Kubernetes"
         }
         failure {
-            echo "❌ Pipeline failed. Check ....."
+            echo "❌ Pipeline failed. Check logs"
         }
         always {
-            echo "Pipeline execution finished...."
+            echo "Pipeline execution finished"
         }
     }
 }
