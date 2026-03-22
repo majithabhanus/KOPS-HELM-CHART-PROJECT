@@ -1,16 +1,23 @@
 # ---------- Stage 1: Build ----------
-FROM node:20 AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install dependencies first (better caching)
 COPY package.json package-lock.json ./
-RUN npm ci --unsafe-perm
+RUN npm ci --omit=dev
 
+# Copy rest of code
 COPY . .
-RUN node ./node_modules/vite/bin/vite.js build
+
+# Build app
+RUN npm run build
 
 # ---------- Stage 2: Nginx ----------
 FROM nginx:alpine
+
+# Remove default nginx files
+RUN rm -rf /usr/share/nginx/html/*
 
 # Copy build output
 COPY --from=builder /app/dist /usr/share/nginx/html
